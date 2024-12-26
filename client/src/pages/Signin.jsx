@@ -35,8 +35,8 @@
         if(data.success==false){
           dispatch(signInFaliure(data.message));
           return;
-        }
-        dispatch(signInSuccess());
+        } 
+        dispatch(signInSuccess(data));
         navigate('/') ;
         console.log(data);
       } catch (error) {
