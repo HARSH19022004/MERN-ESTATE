@@ -4,7 +4,7 @@ import { useRef } from 'react';
 import {getDownloadURL, getStorage, ref, uploadBytesResumable} from 'firebase/storage';
 import app from '../firebase'; 
 import { useDispatch } from 'react-redux';
-import { updateUserStart,updateUserSuccess,updateUserFailure  } from '../redux/user/userSlice';
+import { updateUserStart,updateUserSuccess,updateUserFailure, deleteUserFailure, deleteUserStart, deleteUserSuccess  } from '../redux/user/userSlice';
 
 
 
@@ -63,7 +63,7 @@ export default function profile() {
         body:JSON.stringify(formData),
       });
       const data =await res.json();
-      if(data.success==false){
+      if(data.success===false){
         dispatch(updateUserFailure(data.message))
         return;
       }
@@ -73,7 +73,23 @@ export default function profile() {
       dispatch(updateUserFailure(error.message));
     }
   } 
-  
+
+  const handleDeleteUser= async()=>{
+    try {
+      dispatch(deleteUserStart);
+      const res= await fetch (`/api/user/delete/${currentUser._id}`,{
+        method:'DELETE',
+      });      
+      const data =await res.json();
+      if(data.success ===false){
+        dispatch(deleteUserFailure(data.message));
+        return;
+      }
+      dispatch(deleteUserSuccess(data));
+    } catch (error) {
+      dispatch(deleteUserFailure(error.message));
+    }
+  }
   
   return (
     <div className='p-3 max-w-lg mx-auto'>
@@ -97,7 +113,7 @@ export default function profile() {
         <button disabled={loading} className='bg-slate-700 p-2 rounded-lg uppercase hover:opacity-95 text-white disabled:opacity-85'>{loading? 'Loadinig': 'Update'}</button>
       </form>
       <div className='flex justify-between m-2'>
-        <span className='text-red-700 cursor-pointer'>Delete account</span>
+        <span onClick={handleDeleteUser} className='text-red-700 cursor-pointer'>Delete account</span>
         <span className='text-red-700 cursor-pointer'>Sign out</span>
       </div>
       <p className='text-red-700 mt-5'>{error? error :' '} </p>
