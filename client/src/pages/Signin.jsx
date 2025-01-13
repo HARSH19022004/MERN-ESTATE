@@ -1,8 +1,8 @@
   import { useState } from 'react';
   import {Link,useNavigate} from 'react-router-dom';
   import { useDispatch, useSelector } from 'react-redux';
-  import { signInStart,signInFaliure,signInSuccess } from '../redux/user/userSlice';
-import { OAuth } from '../components/OAuth';
+  import { signInStart,signInFailure,signInSuccess } from '../redux/user/userSlice';
+  import { OAuth } from '../components/OAuth';
 
 
   export default function Signin() {
@@ -34,14 +34,14 @@ import { OAuth } from '../components/OAuth';
 
         const data = await res.json();
         if(data.success==false){
-          dispatch(signInFaliure(data.message));
+          dispatch(signInFailure(data.message));
           return;
         } 
         dispatch(signInSuccess(data));
         navigate('/') ;
         console.log(data);
       } catch (error) {
-        dispatch(signInFaliure(error.message));
+        dispatch(signInFailure(error.message));
       }
     };
 
