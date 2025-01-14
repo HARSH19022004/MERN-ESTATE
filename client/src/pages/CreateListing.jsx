@@ -84,12 +84,13 @@ export default function CreateListing() {
               Upload
             </button>
           </div>
-        </div>
-        <button
+          <button
           type="submit"
           className="bg-green-600 text-white p-4 rounded-lg uppercase hover:bg-green-700 focus:ring focus:ring-green-300">
             Create Listing
           </button>
+        </div>
+        
       </form>
     </main>
   );
