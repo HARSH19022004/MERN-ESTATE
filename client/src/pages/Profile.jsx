@@ -38,11 +38,12 @@ export default function profile() {
         setFilePerc(Math.round(progress));
       },
       (error)=>{
-        setFileUploadError=true;
+        setFileUploadError(true);
       },
       ()=>{
         getDownloadURL(uploadTask.snapshot.ref).then
         ((downloadURL)=>{
+          // console.log('File available at', downloadURL);
           setFormData({...formData,avatar:downloadURL})
         })
       }
@@ -56,6 +57,7 @@ export default function profile() {
     e.preventDefault();
     try {
       dispatch(updateUserStart());
+      console.log(formData);
       const res= await fetch (`/api/user/update/${currentUser._id}`,{
         method:'POST',
         headers:{
