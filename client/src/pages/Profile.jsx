@@ -8,7 +8,6 @@ import { updateUserStart,updateUserSuccess,updateUserFailure, deleteUserFailure,
 import {Link} from 'react-router-dom';
 
 
-
 export default function profile() {
   const {currentUser,loading,error} =useSelector((state)=>state.user);
   const fileref= useRef(null);
@@ -17,7 +16,9 @@ export default function profile() {
   const [filePerc,setFilePerc] =useState(0);
   const [formData ,setFormData] =useState({});
   const [fileUploadError ,setFileUploadError] =useState(false);
+  const [showListingsError ,setShowListingsError] =useState(false);
   const [updateSuccess ,setUpdateSuccess]= useState(false);
+  const [userListings ,setUserListings]=useState([]);
   // console.log(formData);
 
   useEffect(()=>{
@@ -107,6 +108,22 @@ export default function profile() {
       dispatch(signoutUserFailure(error.message));
     }
   }
+
+  const handleShowListinigs=async ()=>{
+    try {
+      setShowListingsError(false);
+      const res = await fetch(`/api/user/listings/${currentUser._id}`);
+      const data =await res.json();
+      if(data.success===false){
+        setShowListingsError(true);      
+        return;
+      }
+      setUserListings(data);
+      console.log(data);
+    } catch (error) {
+      setShowListingsError(true);
+    }
+  }
   
   return (
     <div className='p-3 max-w-lg mx-auto'>
@@ -136,6 +153,55 @@ export default function profile() {
       </div>
       <p className='text-red-700 mt-5'>{error? error :' '} </p>
       <p className='text-green-600 mt-4'>{updateSuccess? 'User Updated Successfully' :''}</p>
+      <button onClick={handleShowListinigs} className='text-green-600 w-full '>Show Listings</button>
+      <p className='text-red-700 mt-5 '>{showListingsError ? 'Error Showinig Listinigs' :'' } </p>
+      <div className="p-5 bg-gray-50 rounded-lg shadow-md">
+  <h1 className="text-3xl font-bold text-center text-gray-800 my-7">Your Listings</h1>
+  {userListings && userListings.length > 0 ? (
+    <div className="grid gap-6">
+      {userListings.map((listing) => (
+        <div
+          key={listing._id}
+          className="border bg-white p-4 rounded-lg flex items-center justify-between gap-4 shadow hover:shadow-lg transition"
+        >
+          {/* Listing Image */}
+          <Link to={`/listing/${listing._id}`} className="shrink-0">
+            <img
+              src={listing.imageUrls[0]}
+              alt="Listing cover"
+              className="h-20 w-20 object-cover rounded-lg"
+            />
+          </Link>
+
+          {/* Listing Details */}
+          <div className="flex-1 ml-4">
+            <Link
+              to={`/listing/${listing._id}`}
+              className="text-lg font-semibold text-gray-800 hover:text-blue-600 truncate block"
+            >
+              {listing.name}
+            </Link>
+            <p className="text-gray-600 text-sm line-clamp-2">{listing.description}</p>
+            <p className="text-green-700 font-medium mt-2 text-lg">₹{listing.regularPrice}</p>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col gap-2 items-center">
+            <button className="bg-red-100 text-red-600 px-4 py-2 rounded-lg uppercase font-medium hover:bg-red-200 transition">
+              Delete
+            </button>
+            <button className="bg-green-100 text-green-600 px-4 py-2 rounded-lg uppercase font-medium hover:bg-green-200 transition">
+              Edit
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <p className="text-center text-gray-500">No listings available.</p>
+  )}
+</div>
+
     </div>
   )
 }
