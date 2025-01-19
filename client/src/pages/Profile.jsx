@@ -19,6 +19,10 @@ export default function profile() {
   const [showListingsError ,setShowListingsError] =useState(false);
   const [updateSuccess ,setUpdateSuccess]= useState(false);
   const [userListings ,setUserListings]=useState([]);
+
+  useEffect(()=>{
+    setUserListings(userListings)
+  },[userListings]);
   // console.log(formData);
 
   useEffect(()=>{
@@ -124,6 +128,24 @@ export default function profile() {
       setShowListingsError(true);
     }
   }
+const handlelListingDelete=async(listingId)=>{
+  try {
+    const res =await fetch(`/api/listing/delete/${listingId}`,{
+      method:'DELETE',
+    });
+    const data =await res.json();
+    console.log(data);
+    
+    if(data.success===false) {
+      console.log(data.message);
+      return;
+    }
+    setUserListings((prev)=> prev.filter((listing)=>listing._id !==listingId));  
+  } catch (error) {
+    console.log(error.message);
+    
+  }
+}
   
   return (
     <div className='p-3 max-w-lg mx-auto'>
@@ -187,7 +209,7 @@ export default function profile() {
 
           {/* Action Buttons */}
           <div className="flex flex-col gap-2 items-center">
-            <button className="bg-red-100 text-red-600 px-4 py-2 rounded-lg uppercase font-medium hover:bg-red-200 transition">
+            <button onClick={()=>handlelListingDelete(listing._id)} className="bg-red-100 text-red-600 px-4 py-2 rounded-lg uppercase font-medium hover:bg-red-200 transition">
               Delete
             </button>
             <button className="bg-green-100 text-green-600 px-4 py-2 rounded-lg uppercase font-medium hover:bg-green-200 transition">
