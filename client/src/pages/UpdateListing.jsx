@@ -1,16 +1,17 @@
-import React, {  useState } from 'react';
+
+import React, {useEffect, useState } from 'react';
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
 import app from '../firebase';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate ,useParams} from 'react-router-dom'; 
 
-export default function CreateListing() {
+export default function UpdateListing() {
   const {currentUser} = useSelector((state) => state.user);
   const [files, setFiles] = useState([]);
   const navigate = useNavigate();
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(false);
-  
+  const params =useParams();
   const [loading, setLoading] = useState(false);
   const [imageUploadError, setImageUploadError] = useState(false);
   const [formData, setFormData] = useState({
@@ -26,10 +27,27 @@ export default function CreateListing() {
     bathrooms: 1,
     regularPrice: 500,
     discountPrice: 0,
-  });
+  }); 
   // console.log(formData);
+  useEffect(()=>{
+    const fetchListing =async ()=>{
+      const listingId = params.listingId;
+  console.log(`Fetching data for listingId: ${listingId}`);
+
+      const res =await fetch(`/api/listing/get/${listingId}`);
+      console.log("hii");
+      const data=await res.json();
+      
+      if(data.success===false){
+        console.log(error.message);
+        return;
+      }
+      setFormData(data);
+    }
+    fetchListing();
+  },[]);
+
   
- 
   const handleChange = (e) => {
     if(e.target.id==='sell'|| e.target.id==='rent'){
       setFormData({...formData,type:e.target.value});
@@ -105,7 +123,7 @@ export default function CreateListing() {
       }
       // console.log(currentUser);
       formData.userRef=currentUser?._id;
-      const res= await fetch('/api/listing/create',{
+      const res= await fetch(`/api/listing/update/${params.listingId}`,{
         method:"POST",
         headers:{
           'content-Type':'application/json',
@@ -133,7 +151,7 @@ export default function CreateListing() {
   return (
     <main className="bg-gradient-to-b from-gray-50 to-gray-100 p-6 sm:p-10 min-h-screen">
   <h1 className="text-4xl font-extrabold text-center text-gray-900 mb-8">
-    Create Listing
+    update Listing
   </h1>
   <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-8 bg-white p-8 rounded-xl shadow-2xl">
     {/* Left Column */}
@@ -336,7 +354,7 @@ export default function CreateListing() {
         <button
           type="button"
           onClick={handleImageSubmit}
-          className="p-3 bg-green-600 text-white rounded-lg uppercase font-semibold hover:bg-green-700 focus:ring focus:ring-blue-300 transition duration-300" disabled={uploading}
+          className="p-3 bg-blue-600 text-white rounded-lg uppercase font-semibold hover:bg-blue-700 focus:ring focus:ring-blue-300 transition duration-300" disabled={uploading}
         >
           {uploading ? "uploading..." : "Upload"}
         </button>
@@ -367,9 +385,9 @@ export default function CreateListing() {
       <button 
       disabled={loading || uploading}
         type="submit"
-        className="bg-green-600 text-white py-4 rounded-lg uppercase font-bold hover:bg-green-700 focus:ring focus:ring-blue-300 transition duration-300 shadow-lg"
+        className="bg-blue-600 text-white py-4 rounded-lg uppercase font-bold hover:bg-blue-700 focus:ring focus:ring-blue-300 transition duration-300 shadow-lg"
       >
-        {loading ? "Loading..." :"Create Listing"}
+        {loading ? "Loading..." :"update Listing"}
       </button>
       {error && <p className='text-red-700 text-sm' >{error}</p>}
     </div>

@@ -123,7 +123,7 @@ export default function profile() {
         return;
       }
       setUserListings(data);
-      console.log(data);
+      // console.log(data);
     } catch (error) {
       setShowListingsError(true);
     }
@@ -212,9 +212,11 @@ const handlelListingDelete=async(listingId)=>{
             <button onClick={()=>handlelListingDelete(listing._id)} className="bg-red-100 text-red-600 px-4 py-2 rounded-lg uppercase font-medium hover:bg-red-200 transition">
               Delete
             </button>
+            <Link to={`/update-listing/${listing._id}`}> 
             <button className="bg-green-100 text-green-600 px-4 py-2 rounded-lg uppercase font-medium hover:bg-green-200 transition">
               Edit
             </button>
+            </Link>
           </div>
         </div>
       ))}
